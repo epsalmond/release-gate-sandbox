@@ -1,0 +1,18 @@
+name: Synthetic native pull request merge check
+on:
+  pull_request:
+    branches: ['proof-base-native-merge-*']
+permissions:
+  contents: read
+jobs:
+  freshness:
+    name: Release image freshness proof
+    runs-on: ubuntu-latest
+    steps:
+      - name: Record native pull-request execution identity
+        env:
+          SHA: ${{ github.sha }}
+          SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+          SOURCE_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          printf 'Synthetic execution merge=%s head=%s base=%s\n' "$SHA" "$SOURCE_HEAD" "$SOURCE_BASE"
