@@ -1,0 +1,21 @@
+name: Synthetic native head checks
+on:
+  pull_request_target:
+    branches: ['proof-base-native-*']
+permissions: {}
+jobs:
+  ci:
+    name: lint / typecheck / test / build
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo 'Synthetic check only'
+  title:
+    name: conventional commit title
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo 'Synthetic check only'
+  admission:
+    name: Release image PR admission
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo 'Synthetic check only'
