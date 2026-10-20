@@ -1,0 +1,32 @@
+name: Synthetic current merge probe
+run-name: Synthetic current probe ${{ inputs.request_id }}
+on:
+  workflow_dispatch:
+    inputs:
+      request_id:
+        required: true
+        type: string
+      operations:
+        required: true
+        type: string
+permissions:
+  contents: write
+  statuses: write
+  checks: write
+  pull-requests: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe exact current synthetic merge enforcement
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OPERATIONS: ${{ inputs.operations }}
+        run: python3 current-ref-probe.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: synthetic-current-probe-receipts
+          path: probe-receipts.json
