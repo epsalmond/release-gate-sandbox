@@ -40,8 +40,8 @@ def source_is_release(pr):
     return version(compare['merge_base_commit']['sha'])!=version(pr['head']['sha'])
 
 def synthetic(pr):
-    assert pr['merge_commit_sha']
-    commit=api(PREFIX+'git/commits/'+pr['merge_commit_sha'])
+    ref=api(PREFIX+'git/ref/pull/'+str(pr['number'])+'/merge')
+    commit=api(PREFIX+'git/commits/'+ref['object']['sha'])
     assert [p['sha'] for p in commit['parents']]==[pr['base']['sha'],pr['head']['sha']]
     head=api(PREFIX+'git/commits/'+pr['head']['sha'])
     assert commit['tree']['sha']==head['tree']['sha']
