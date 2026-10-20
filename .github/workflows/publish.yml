@@ -1,0 +1,36 @@
+name: Synthetic status publisher
+run-name: Synthetic status batch ${{ inputs.request_id }}
+on:
+  workflow_dispatch:
+    inputs:
+      request_id:
+        required: true
+        type: string
+      operations:
+        required: true
+        type: string
+permissions:
+  contents: read
+  statuses: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Publish synthetic fixture commit statuses
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OPERATIONS: ${{ inputs.operations }}
+          GH_REPO: ${{ github.repository }}
+        shell: python
+        run: |
+          import json, os, subprocess
+          repo=os.environ['GH_REPO']
+          assert repo == 'epsalmond/release-gate-sandbox'
+          for operation in json.loads(os.environ['OPERATIONS']):
+              sha=operation['sha']
+              assert len(sha)==40 and all(c in '0123456789abcdef' for c in sha)
+              fields={k:v for k,v in operation.items() if k!='sha'}
+              completed=subprocess.run(['gh','api','--method','POST',f'repos/{repo}/statuses/{sha}','--input','-'],input=json.dumps(fields),text=True,capture_output=True,check=True)
+              status=json.loads(completed.stdout)
+              print(json.dumps({k:status.get(k) for k in ['id','sha','context','state','target_url','creator']}))
